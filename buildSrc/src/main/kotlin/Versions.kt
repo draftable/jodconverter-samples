@@ -6,7 +6,7 @@ object Versions {
 
     //  Latest Version:
     //  Visit https://central.sonatype.com and search for: g:org.springframework.boot a:spring-boot
-    const val springBoot = "3.2.0"
+    const val springBoot = "3.4.1"
 
     object Plugins {
 
