@@ -15,6 +15,7 @@ import org.jodconverter.local.LocalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,6 +51,15 @@ public class ConverterController {
     private ParameterDecoder parameterDecoder;
 
     /**
+     * Default for whether all tracked changes should be accepted before conversion. Applied when a
+     * request does not explicitly set the {@code acceptTrackedChanges} parameter. Configurable via
+     * the {@code jodconverter.accept-tracked-changes} property (env {@code
+     * JODCONVERTER_ACCEPT_TRACKED_CHANGES}).
+     */
+    @Value("${jodconverter.accept-tracked-changes:false}")
+    private boolean acceptTrackedChangesByDefault;
+
+    /**
      * Creates a new controller.
      *
      * @param officeManager The manager used to execute conversions.
@@ -82,11 +92,17 @@ public class ConverterController {
                     description = "The document format to convert the input document to.",
                     required = true)
             @RequestParam(name = "format") final String convertToFormat,
+            @Parameter(
+                    description =
+                            "Whether to accept all tracked changes before converting. Defaults to the"
+                                    + " server configuration when omitted.")
+            @RequestParam(name = "acceptTrackedChanges", required = false)
+            final Boolean acceptTrackedChanges,
             @Parameter(description = "The custom options to apply to the conversion.")
             @RequestParam(required = false) final Map<String, String> parameters) {
 
         LOGGER.debug("convertUsingRequestParam > Converting file to {}", convertToFormat);
-        return convert(inputFile, convertToFormat, parameters);
+        return convert(inputFile, convertToFormat, acceptTrackedChanges, parameters);
     }
 
     @Operation(
@@ -112,16 +128,23 @@ public class ConverterController {
                     description = "The document format to convert the input document to.",
                     required = true)
             @PathVariable(name = "format") final String convertToFormat,
+            @Parameter(
+                    description =
+                            "Whether to accept all tracked changes before converting. Defaults to the"
+                                    + " server configuration when omitted.")
+            @RequestParam(name = "acceptTrackedChanges", required = false)
+            final Boolean acceptTrackedChanges,
             @Parameter(description = "The custom options to apply to the conversion.")
             @RequestParam(required = false) final Map<String, String> parameters) {
 
         LOGGER.debug("convertUsingPathVariable > Converting file to {}", convertToFormat);
-        return convert(inputFile, convertToFormat, parameters);
+        return convert(inputFile, convertToFormat, acceptTrackedChanges, parameters);
     }
 
     private ResponseEntity<Object> convert(
             final MultipartFile inputFile,
             final String outputFormat,
+            final Boolean acceptTrackedChanges,
             final Map<String, String> parameters) {
 
         if (inputFile.isEmpty()) {
@@ -145,13 +168,21 @@ public class ConverterController {
             final Map<String, Object> storeProperties = new HashMap<>();
             parameterDecoder.decodeParameters(parameters, loadProperties, storeProperties);
 
-            // Create a converter with the properties.
-            final DocumentConverter converter =
+            // Create a converter with the properties, optionally accepting all tracked changes
+            // (redlines) before the document is exported.
+            final LocalConverter.Builder converterBuilder =
                     LocalConverter.builder()
                             .officeManager(officeManager)
                             .loadProperties(loadProperties)
-                            .storeProperties(storeProperties)
-                            .build();
+                            .storeProperties(storeProperties);
+
+            final boolean acceptChanges =
+                    acceptTrackedChanges != null ? acceptTrackedChanges : acceptTrackedChangesByDefault;
+            if (acceptChanges) {
+                converterBuilder.filterChain(new AcceptAllTrackedChangesFilter());
+            }
+
+            final DocumentConverter converter = converterBuilder.build();
 
             // Convert...
             converter.convert(inputFile.getInputStream()).to(baos).as(targetFormat).execute();

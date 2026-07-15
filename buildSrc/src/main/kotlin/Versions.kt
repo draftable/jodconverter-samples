@@ -18,7 +18,7 @@ object Versions {
 
         //  Latest Version:
         //  Visit https://central.sonatype.com and search for: g:org.jodconverter a:jodconverter-core
-        const val jodConverter = "4.4.7"
+        const val jodConverter = "4.4.9"
 
         //  Latest Version:
         //  Visit https://central.sonatype.com and search for: g:commons-fileupload a:commons-fileupload
