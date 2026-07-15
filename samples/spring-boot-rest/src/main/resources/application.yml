@@ -20,6 +20,10 @@ springdoc:
     path: /swagger-ui.html
 
 jodconverter:
+  # Accept all tracked changes (redlines) before converting a document (e.g. docx -> pdf).
+  # Can be overridden per request with the `acceptTrackedChanges` request parameter.
+  # Set JODCONVERTER_ACCEPT_TRACKED_CHANGES=true to enable globally.
+  accept-tracked-changes: ${JODCONVERTER_ACCEPT_TRACKED_CHANGES:false}
   local:
     enabled: true
     port-numbers: 2002,2003
