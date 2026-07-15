@@ -6,7 +6,9 @@ object Versions {
 
     //  Latest Version:
     //  Visit https://central.sonatype.com and search for: g:org.springframework.boot a:spring-boot
-    const val springBoot = "3.4.10"
+    // 3.5.16 BOM pulls fixed tomcat-embed-core 10.1.55 and jackson-bom 2.21.4,
+    // and fixes spring-boot CVE-2026-40973. Do not drop below 3.5.15 (3.5.14 still ships tomcat 10.1.54).
+    const val springBoot = "3.5.16"
 
     object Plugins {
 
@@ -30,7 +32,8 @@ object Versions {
 
         //  Latest Version:
         //  Visit https://central.sonatype.com and search for: g:org.springdoc a:springdoc-openapi-starter-webmvc-ui
-        const val openApi = "2.3.0"
+        // 2.8.x required for Spring Boot 3.5.x compatibility (2.3.0 targets Spring Boot 3.2).
+        const val openApi = "2.8.6"
 
         //  Latest Version:
         //  Visit https://central.sonatype.com and search for: g:javax.servlet a:javax.servlet-api
@@ -42,7 +45,7 @@ object Versions {
 
         //  Latest Version:
         //  Visit https://central.sonatype.com and search for: g:io.swagger.core.v3 a:swagger-project
-        const val swagger = "2.2.20"
+        const val swagger = "2.2.31"
 
         // https://search.maven.org/artifact/org.apache.tomcat.embed/tomcat-embed-core
         // We can't use 9.0.31+ until this is resolved:
