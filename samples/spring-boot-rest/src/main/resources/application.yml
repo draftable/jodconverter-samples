@@ -23,7 +23,8 @@ jodconverter:
   local:
     enabled: true
     port-numbers: 2002,2003
-    format-options:
+  document-formats:
+    options:
       html:
         store:
           TEXT:

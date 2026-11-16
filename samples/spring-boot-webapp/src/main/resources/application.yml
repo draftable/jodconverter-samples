@@ -12,7 +12,8 @@ spring:
 jodconverter:
   local:
     enabled: true
-    format-options:
+  document-formats:
+    options:
       html:
         store:
           TEXT:
