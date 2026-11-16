@@ -68,7 +68,7 @@ public class ConverterController {
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
       final DocumentFormat targetFormat =
-          DefaultDocumentFormatRegistry.getFormatByExtension(outputFormat);
+          DefaultDocumentFormatRegistry.getInstance().getFormatByExtension(outputFormat);
       Assert.notNull(targetFormat, "targetFormat must not be null");
       converter.convert(inputFile.getInputStream()).to(baos).as(targetFormat).execute();
 
