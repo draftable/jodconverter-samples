@@ -136,7 +136,7 @@ public class ConverterController {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             final DocumentFormat targetFormat =
-                    DefaultDocumentFormatRegistry.getFormatByExtension(outputFormat);
+                    DefaultDocumentFormatRegistry.getInstance().getFormatByExtension(outputFormat);
             Assert.notNull(targetFormat, "targetFormat must not be null");
 
             // Decode the parameters to load and store properties.
